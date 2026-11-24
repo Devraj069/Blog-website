@@ -1,6 +1,7 @@
 const express= require('express')
 const mongoose = require('mongoose')
 const User = require("./models/User")
+const userRoutes = require("./routes/authRoutes")
 require("dotenv").config();
 const app=express()
 
@@ -16,49 +17,7 @@ console.log("DB Connected")
 })
 
 //routes
-app.get("/auth/login",(req,res)=>{
-    res.render("login")
-})
-app.get("/auth/register",(req,res)=>{
-    res.render("register")
-})
-
-app.post("/login",async (req,res)=>{
-    const {username , password}=req.body;
-    try{
-        const user = await User.findOne({username:username})
-        const isMatch = await User.findOne({password})
-        if(user && isMatch){
-            res.send("Login Successfull")
-        } else{
-            res.send("Invalid Details")
-        }
-    }
-    catch(error){
-            console.log(error)
-    }
-})
-app.post("/register",async (req,res)=>{
-    const {username,email,password}=req.body;
-    try{
-        const user = await User.findOne({email:email});
-        if(user){
-            res.send("User Exits")
-        } else{
-            const newUser = new User({
-                username,
-                email,
-                password
-            })
-            await newUser.save();
-            res.redirect("/auth/login")
-        }
-    }
-    catch(error){
-        console.log(error)
-    }
-})
-
+app.use("/auth",userRoutes)
 
 
 app.listen(process.env.PORT,()=>{
